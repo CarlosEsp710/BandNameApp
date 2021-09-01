@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Band> bands = [
     Band(id: '1', name: 'Interpol', votes: 5),
-    Band(id: '2', name: 'Metallica', votes: 4),
+    Band(id: '2', name: 'Audioslave', votes: 4),
     Band(id: '3', name: 'Pearl Jam', votes: 2),
     Band(id: '4', name: 'Bon Jovi', votes: 7),
     Band(id: '5', name: 'The Killers', votes: 5)
