@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 import 'package:bands_name/models/band.dart';
 import 'package:bands_name/services/socket_service.dart';
@@ -56,10 +57,15 @@ class _HomePageState extends State<HomePage> {
                   : Icon(Icons.wifi_off_rounded, color: Colors.red[300])),
         ],
       ),
-      body: ListView.builder(
-        itemCount: bands.length,
-        itemBuilder: (context, i) => _bandTile(bands[i]),
-      ),
+      body: Column(children: <Widget>[
+        _showGraph(),
+        Expanded(
+          child: ListView.builder(
+            itemCount: bands.length,
+            itemBuilder: (context, i) => _bandTile(bands[i]),
+          ),
+        ),
+      ]),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         elevation: 1,
@@ -149,5 +155,46 @@ class _HomePageState extends State<HomePage> {
     }
 
     Navigator.pop(context);
+  }
+
+  Widget _showGraph() {
+    // ignore: prefer_collection_literals
+    Map<String, double> dataMap = Map();
+
+    // ignore: avoid_function_literals_in_foreach_calls
+    bands.forEach((band) {
+      dataMap.putIfAbsent(band.name, () => band.votes.toDouble());
+    });
+
+    final List<Color> colorList = [
+      const Color(0XFFE3F2FD),
+      const Color(0XFF90CAF9),
+      const Color(0XFFFCE4EC),
+      const Color(0XFFF48FB1),
+      const Color(0XFFFFFDE7),
+      const Color(0XFFFFF59D),
+      const Color(0XFFFFEBEE),
+      const Color(0XFFEF9A9A),
+      const Color(0XFFE8F5E9),
+      const Color(0XFFA5D6A7),
+    ];
+
+    return dataMap.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 12),
+            child: SizedBox(
+              width: double.infinity,
+              height: 200,
+              child: PieChart(
+                dataMap: dataMap,
+                chartType: ChartType.ring,
+                colorList: colorList,
+                animationDuration: const Duration(microseconds: 800),
+                chartValuesOptions: const ChartValuesOptions(
+                    showChartValuesInPercentage: true, showChartValues: true),
+              ),
+            ),
+          )
+        : const LinearProgressIndicator();
   }
 }
