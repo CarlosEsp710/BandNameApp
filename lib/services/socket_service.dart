@@ -13,7 +13,9 @@ class SocketService with ChangeNotifier {
   ServerStatus _serverStatus = ServerStatus.Connecting;
 
   ServerStatus get serverStatus => _serverStatus;
+
   IO.Socket get socket => _socket;
+  Function get emit => _socket.emit;
 
   SocketService() {
     _initConfig();

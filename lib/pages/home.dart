@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import 'package:bands_name/models/band.dart';
+import 'package:bands_name/services/socket_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,22 +15,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Band> bands = [
-    Band(id: '1', name: 'Interpol', votes: 5),
-    Band(id: '2', name: 'Audioslave', votes: 4),
-    Band(id: '3', name: 'Pearl Jam', votes: 2),
-    Band(id: '4', name: 'Bon Jovi', votes: 7),
-    Band(id: '5', name: 'The Killers', votes: 5)
-  ];
+  List<Band> bands = [];
+
+  @override
+  void initState() {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
+    socketService.socket.on('active-bands', (payload) {
+      bands = (payload as List).map((band) => Band.fromMap(band)).toList();
+
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
+    socketService.socket.off('active-bands');
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final socketService = Provider.of<SocketService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title:
             const Text("Band Names", style: TextStyle(color: Colors.black87)),
-        elevation: 1,
         backgroundColor: Colors.white,
+        elevation: 1,
+        actions: <Widget>[
+          Container(
+              margin: const EdgeInsets.only(right: 10),
+              child: (socketService.serverStatus == ServerStatus.Online)
+                  ? Icon(Icons.wifi_outlined, color: Colors.blue[300])
+                  : Icon(Icons.wifi_off_rounded, color: Colors.red[300])),
+        ],
       ),
       body: ListView.builder(
         itemCount: bands.length,
