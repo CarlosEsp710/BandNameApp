@@ -8,16 +8,19 @@ import 'package:socket_io_client/socket_io_client.dart';
 enum ServerStatus { Online, Offline, Connecting }
 
 class SocketService with ChangeNotifier {
+  late IO.Socket _socket;
+
   ServerStatus _serverStatus = ServerStatus.Connecting;
 
-  get serverStatus => _serverStatus;
+  ServerStatus get serverStatus => _serverStatus;
+  IO.Socket get socket => _socket;
 
   SocketService() {
     _initConfig();
   }
 
   void _initConfig() {
-    IO.Socket socket = IO.io(
+    _socket = IO.io(
         'http://localhost:3000',
         OptionBuilder()
             .setTransports(['websocket']) // for Flutter or Dart VM
@@ -34,6 +37,6 @@ class SocketService with ChangeNotifier {
       notifyListeners();
     });
 
-    socket.on('message', (payload) => print(payload));
+    // socket.on('message', (payload) => print(payload));
   }
 }
